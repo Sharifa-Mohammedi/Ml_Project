@@ -17,6 +17,8 @@ from xgboost import XGBRFRegressor
 from src.exception import CustomException
 from src.logger import logging
 from src.utils import save_object, evaluate_models
+from sklearn.model_selection import GridSearchCV
+
 
 
 @dataclass
@@ -47,8 +49,38 @@ class ModelTrainer:
                 "AdaBoost Classifier": AdaBoostRegressor(),
             }
             
+            param_grid = {
+            "Random Forest": {
+                "n_estimators": [50, 100],
+                "max_depth": [None, 5, 10],
+            },
+            "Decision Tree": {
+                "max_depth": [None, 5, 10],
+                "min_samples_split": [2, 5],
+            },
+            "Gradiant Boosting": {
+                "n_estimators": [50, 100],
+                "learning_rate": [0.01, 0.1],
+            },
+            "Linear Regression": {},
+            "KNeighbors Regressor": {
+                "n_neighbors": [3, 5, 10],
+            },
+            "XGBClassifier": {
+                "n_estimators": [50, 100],
+                "learning_rate": [0.01, 0.1],
+            },
+            "CatBoostRegressor": {
+                "depth": [3, 6],
+                "learning_rate": [0.01, 0.1],
+            },
+            "AdaBoost Classifier": {
+                "n_estimators": [50, 100],
+                "learning_rate": [0.01, 0.1],
+            }
+        }
             model_report:dict=evaluate_models(X_train=X_train,y_train=y_train,X_test=X_test,y_test=y_test,
-                                              models=models)
+                                              models=models, param_grid=param_grid)
             ## To get best model score from dict
             best_model_score = max(sorted(model_report.values()))
             
